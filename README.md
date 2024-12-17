@@ -29,8 +29,8 @@ Bem-vindo ao **Bolivia Figurinhas**! Este é um projeto focado em coleções de 
 
 1. Clone o repositório:
    	```bash
-   	git clone https://github.com/seu-usuario/bolivia-figurinhas.git
-  	 cd bolivia-figurinhas/backend
+   	git clone https://github.com/seu-usuario/boliviafigurinhas.git
+      cd bolivia-figurinhas/backend
   
 2.	Instale as dependências do projeto usando o Poetry:
   	```bash
