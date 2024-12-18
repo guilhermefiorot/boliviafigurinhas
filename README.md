@@ -20,7 +20,7 @@ Bem-vindo ao **Bolivia Figurinhas**! Este é um projeto focado em coleções de 
 
 ### Pré-requisitos
 
-- Python 3.8+
+- Python 3.10+
 - Node.js 14+
 - Poetry
 - npm ou yarn (para gerenciar os pacotes do React)
