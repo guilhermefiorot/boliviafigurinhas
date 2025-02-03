@@ -1,6 +1,6 @@
 # Bolivia Figurinhas Project
 
-This is a Flask application for the online shop called bolivia moveis
+This is a Flask application for the online cards shop called bolivia figurinhas
 
 ## Documents
   ### Sonar
@@ -21,7 +21,7 @@ Clone this repository to your local machine:
 
 ```bash
 git clone https://github.com/GuilhermeFiorot/boliviafigurinhasbackend.git
-cd boliviamoveisbackend
+cd boliviafigurinhasbackend
 ```
 
 ### 2. Virtual Environment (Optional)
