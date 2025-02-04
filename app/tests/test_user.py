@@ -4,10 +4,10 @@ from app.models.user import User
 from app.services.user_service import create_user
 
 
-def create_test_user():
+def create_test_user(session):
     user_data = {
         'name': 'testuser',
-        'email': 'testuser@example.com',
+        'email': 'testuser3@example.com',
         'password': 'testpassword',
         'endereco': 'Rua 1, 123',
         'cidade': 'Espirito Santo',
@@ -16,7 +16,9 @@ def create_test_user():
         'telefone': '27999999999',
         'cpf': '12345678900',
     }
-    return create_user(user_data)
+    user = create_user(user_data)
+    session.commit()
+    return user
 
 
 def get_access_token(client, email, password):
@@ -50,8 +52,7 @@ def test_add_user(client, session):
 
 
 def test_get_user(client, session):
-    user = create_test_user()
-    session.commit()
+    user = create_test_user(session)
 
     access_token = get_access_token(client, user.email, 'testpassword')
     headers = {'Authorization': f'Bearer {access_token}'}
