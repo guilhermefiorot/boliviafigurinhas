@@ -1,6 +1,6 @@
 Flask
-Flask-SQLAlchemy
-Flask-Migrate
+Flask-Migrate==4.0.5
+Flask-SQLAlchemy==3.1.1
 Flask-RESTful
 python-dotenv
 flask-jwt-extended

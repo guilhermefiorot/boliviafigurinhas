@@ -51,15 +51,16 @@ def get_access_token(client, email, password):
 def test_add_item_to_cart(client, session):
     user = create_test_user()
     session.commit()
-
     access_token = get_access_token(client, user.email, "testpassword")
     headers = {"Authorization": f"Bearer {access_token}"}
 
     product = create_test_product(session)
+    session.commit()
+    payload = {"product_id": product.id, "quantity": 2}
 
     response = client.post(
         url_for("api.cartresource"),
-        json={"product_id": product.id, "quantity": 2},
+        json=payload,
         headers=headers
     )
     assert response.status_code == 201
