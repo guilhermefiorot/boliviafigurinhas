@@ -4,45 +4,45 @@ from app import create_app
 from app.core.database import db as _db
 from app.core.config import TestConfig
 
-
 @pytest.fixture(scope='session')
 def app():
-    # Cria uma instância do app
+    """Cria uma instância do app Flask configurada para testes."""
     app = create_app()
-    # Configura o app para usar a configuração de teste
     app.config.from_object(TestConfig)
-    # Cria as tabelas no banco de dados
+
     with app.app_context():
         _db.create_all()
-    return app
+    
+    yield app
 
+    with app.app_context():
+        _db.drop_all()  # Remove tabelas após os testes
 
 @pytest.fixture(scope='session')
 def db(app):
+    """Fornece o banco de dados para os testes."""
     return _db
-
 
 @pytest.fixture(scope='function')
 def client(app):
+    """Fornece um cliente de teste para a API Flask."""
     return app.test_client()
-
 
 @pytest.fixture(scope='function')
 def session(db, app):
+    """Cria uma sessão isolada para cada teste."""
     with app.app_context():
-        # Conecta ao banco de dados
         connection = db.engine.connect()
-        # Inicia uma transação
-        transaction = connection.begin()
-        # Cria uma sessão escopada
+        transaction = connection.begin()  # Inicia transação
         session_factory = scoped_session(sessionmaker(bind=connection))
-        # Atribui no db.session
-        db.session = session_factory
-        # Fornece para testes
-        yield session_factory
-        # Após os testes, faz rollback
-        transaction.rollback()
-        # Fecha a conexão
-        connection.close()
-        # Remove a sessão
-        session_factory.remove()
+        
+        test_session = session_factory()
+        test_session.begin_nested()  # Cria uma transação aninhada
+
+        yield test_session  # Fornece a sessão para os testes
+
+        test_session.rollback()  # Rollback no final de cada teste
+        test_session.close()  # Fecha a sessão
+        transaction.rollback()  # Reverte a transação principal
+        connection.close()  # Fecha a conexão
+        session_factory.remove()  # Remove a sessão escopada
