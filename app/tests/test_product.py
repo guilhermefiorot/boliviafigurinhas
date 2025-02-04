@@ -24,7 +24,10 @@ def create_test_product(session):
         'name': 'Test Product',
         'description': 'This is a test product.',
         'image': 'https://example.com/product.jpg',
-        'price': 100.0
+        'price': 100.0,
+        'condition': 9.5,
+        'rarity': 'Rare',
+        'quantity': 10
     }
     product = Product(**product_data)
     session.add(product)
@@ -52,7 +55,10 @@ def test_add_product(client, session):
         'name': 'New Product',
         'description': 'This is a new product.',
         'image': 'https://example.com/newproduct.jpg',
-        'price': 150.0
+        'price': 150.0,
+        'condition': 8.0,
+        'rarity': 'Common',
+        'quantity': 20
     }
     response = client.post(
         url_for('api.productlistresource'),
@@ -63,6 +69,9 @@ def test_add_product(client, session):
     data = response.get_json()
     assert data['name'] == product_data['name']
     assert data['price'] == product_data['price']
+    assert data['condition'] == product_data['condition']
+    assert data['rarity'] == product_data['rarity']
+    assert data['quantity'] == product_data['quantity']
 
 
 def test_get_product(client, session):
@@ -79,3 +88,7 @@ def test_get_product(client, session):
     data = response.get_json()
     assert data['name'] == product.name
     assert data['description'] == product.description
+    assert data['price'] == product.price
+    assert data['condition'] == product.condition
+    assert data['rarity'] == product.rarity
+    assert data['quantity'] == product.quantity
