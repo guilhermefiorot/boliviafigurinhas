@@ -1,13 +1,13 @@
 import json
 from flask import url_for
 from app.models.user import User
-from app.services.user_service import create_user
+from app.services.user_service import create_user, get_user_by_email
 
 
-def create_test_user(session):
+def create_test_user():
     user_data = {
         'name': 'testuser',
-        'email': 'testuser3@example.com',
+        'email': 'testuser@example.com',
         'password': 'testpassword',
         'endereco': 'Rua 1, 123',
         'cidade': 'Espirito Santo',
@@ -16,9 +16,10 @@ def create_test_user(session):
         'telefone': '27999999999',
         'cpf': '12345678900',
     }
-    user = create_user(user_data)
-    session.commit()
-    return user
+    existing_user = get_user_by_email(user_data['email'])
+    if not existing_user:
+        return create_user(user_data)
+    return existing_user
 
 
 def get_access_token(client, email, password):
@@ -52,7 +53,8 @@ def test_add_user(client, session):
 
 
 def test_get_user(client, session):
-    user = create_test_user(session)
+    user = create_test_user()
+    session.commit()
 
     access_token = get_access_token(client, user.email, 'testpassword')
     headers = {'Authorization': f'Bearer {access_token}'}

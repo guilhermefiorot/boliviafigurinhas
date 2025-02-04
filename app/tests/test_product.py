@@ -1,30 +1,25 @@
 import json
-import uuid
 from flask import url_for
 from app.models.product import Product
 from app.services.user_service import create_user
 
 
-def create_test_user(session):
-    """Creates a unique test user to avoid UNIQUE constraint failures."""
+def create_test_user():
     user_data = {
         'name': 'testuser',
-        'email': 'testuser2@example.com',
+        'email': 'testuser@example.com',
         'password': 'testpassword',
         'endereco': 'Rua 1, 123',
         'cidade': 'Espirito Santo',
         'cep': '29100000',
         'pais': 'Brasil',
         'telefone': '27999999999',
-        'cpf': '01234567890',
+        'cpf': '12345678900',
     }
-    user = create_user(user_data)
-    session.commit()
-    return user
+    return create_user(user_data)
 
 
 def create_test_product(session):
-    """Creates a test product with required fields to prevent NULL errors."""
     product_data = {
         'name': 'Test Product',
         'description': 'This is a test product.',
@@ -41,53 +36,61 @@ def create_test_product(session):
 
 
 def get_access_token(client, email, password):
-    """Obtains a valid access token for authentication."""
     response = client.post(
         url_for('api.loginresource'),
         json={'email': email, 'password': password}
     )
-    assert response.status_code == 200, "Failed to obtain authentication token"
-    return response.get_json()['access_token']
+    data = response.get_json()
+    return data['access_token']
 
 
 def test_add_product(client, session):
-    """Tests adding a new product to the database."""
-    user = create_test_user(session)
+    """Test creating a new product with all required fields"""
+    user = create_test_user()
+    session.commit()
+
     access_token = get_access_token(client, user.email, 'testpassword')
     headers = {'Authorization': f'Bearer {access_token}'}
 
     product_data = {
         'name': 'New Product',
-        'description': 'A new test product.',
+        'description': 'This is a new product.',
         'image': 'https://example.com/newproduct.jpg',
         'price': 150.0,
         'condition': 8.0,
         'rarity': 'Common',
         'quantity': 20
     }
-
     response = client.post(
         url_for('api.productlistresource'),
         json=product_data,
         headers=headers
     )
-
-    assert response.status_code == 201, f"Unexpected response: {response.get_json()}"
+    assert response.status_code == 201
     data = response.get_json()
     assert data['name'] == product_data['name']
-
+    assert data['price'] == product_data['price']
+    assert data['condition'] == product_data['condition']
+    assert data['rarity'] == product_data['rarity']
+    assert data['quantity'] == product_data['quantity']
 
 
 def test_get_product(client, session):
-    """Tests retrieving a product from the database."""
-    user = create_test_user(session)
+    """Test retrieving an existing product"""
+    user = create_test_user()
+    session.commit()
+
     access_token = get_access_token(client, user.email, 'testpassword')
     headers = {'Authorization': f'Bearer {access_token}'}
 
     product = create_test_product(session)
 
     response = client.get(url_for('api.productresource', id=product.id), headers=headers)
-    assert response.status_code == 200, f"Unexpected response: {response.get_json()}"
-
+    assert response.status_code == 200
     data = response.get_json()
     assert data['name'] == product.name
+    assert data['description'] == product.description
+    assert data['price'] == product.price
+    assert data['condition'] == product.condition
+    assert data['rarity'] == product.rarity
+    assert data['quantity'] == product.quantity

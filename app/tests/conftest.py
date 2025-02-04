@@ -7,37 +7,42 @@ from app.core.config import TestConfig
 
 @pytest.fixture(scope='session')
 def app():
-    """Creates a Flask test app with test configuration."""
+    # Cria uma instância do app
     app = create_app()
+    # Configura o app para usar a configuração de teste
     app.config.from_object(TestConfig)
+    # Cria as tabelas no banco de dados
     with app.app_context():
         _db.create_all()
-    yield app
-    with app.app_context():
-        _db.drop_all()
+    return app
 
 
 @pytest.fixture(scope='session')
 def db(app):
-    """Provides a database session for tests."""
     return _db
-
-
-@pytest.fixture(scope='function', autouse=True)
-def session(db, app):
-    """Creates a new session for a test and ensures rollback."""
-    with app.app_context():
-        connection = db.engine.connect()
-        transaction = connection.begin()
-        session_factory = scoped_session(sessionmaker(bind=connection))
-        db.session = session_factory
-        yield session_factory
-        session_factory.remove()
-        transaction.rollback()
-        connection.close()
 
 
 @pytest.fixture(scope='function')
 def client(app):
-    """Provides a test client."""
     return app.test_client()
+
+
+@pytest.fixture(scope='function')
+def session(db, app):
+    with app.app_context():
+        # Conecta ao banco de dados
+        connection = db.engine.connect()
+        # Inicia uma transação
+        transaction = connection.begin()
+        # Cria uma sessão escopada
+        session_factory = scoped_session(sessionmaker(bind=connection))
+        # Atribui no db.session
+        db.session = session_factory
+        # Fornece para testes
+        yield session_factory
+        # Após os testes, faz rollback
+        transaction.rollback()
+        # Fecha a conexão
+        connection.close()
+        # Remove a sessão
+        session_factory.remove()
