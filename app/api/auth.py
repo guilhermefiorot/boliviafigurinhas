@@ -12,7 +12,7 @@ class LoginResource(Resource):
         data = request.get_json()
         user = get_user_by_email(data['email'])
         if user and check_password(user, data['password']):
-            access_token = create_access_token(identity=user.id)
+            access_token = create_access_token(identity=user.email)
             return {"access_token": access_token}, 200
         return {"message": "Invalid credentials"}, 401
 
@@ -24,5 +24,5 @@ class RegisterResource(Resource):
         if user:
             return {"message": "User already exists"}, 400
         new_user = create_user(data)
-        access_token = create_access_token(identity=new_user.id)
+        access_token = create_access_token(identity=new_user.email)
         return {"access_token": access_token}, 201
