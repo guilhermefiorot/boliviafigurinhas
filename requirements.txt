@@ -12,3 +12,4 @@ flask-cors
 gunicorn
 flasgger
 pyyaml
+psycopg2
