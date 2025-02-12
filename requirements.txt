@@ -10,3 +10,5 @@ flask-testing
 marshmallow
 flask-cors
 gunicorn
+flasgger
+pyyaml
