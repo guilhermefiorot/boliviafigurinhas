@@ -4,7 +4,7 @@ info:
   version: "1.0.0"
   title: "Bolivia Figurinhas Backend API"
 host: "localhost:8080"
-basePath: "/api"
+basePath: "/api/v1"
 schemes:
   - "http"
 securityDefinitions:
@@ -65,7 +65,7 @@ paths:
         401:
           description: "Invalid credentials"
 
-  /v1/forgot_password:
+  /forgot_password:
     post:
       tags:
         - "User"
